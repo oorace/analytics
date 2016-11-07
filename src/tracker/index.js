@@ -1,6 +1,5 @@
 import LOG from '../logger';
-
-const SESSION_COOKIE_TIMEOUT_IN_SECONDS = 1800;
+import * as constants from '../constants';
 
 export default class Tracker {
 
@@ -17,7 +16,7 @@ export default class Tracker {
     window[trackerName]('newTracker', trackerNamespace, collectorHost, {
       appId,
       cookieDomain,
-      sessionCookieTimeout: SESSION_COOKIE_TIMEOUT_IN_SECONDS
+      sessionCookieTimeout: constants.SESSION_COOKIE_TIMEOUT_IN_SECONDS
     });
 
     this.tracker = window[trackerName];
