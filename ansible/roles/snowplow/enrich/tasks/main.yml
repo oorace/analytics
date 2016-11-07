@@ -1,0 +1,78 @@
+- fail: msg="'snowplow_stream_enrich_installation_folder' variable must be defined"
+  when: snowplow_stream_enrich_installation_folder is not defined
+
+- name: Make sure unzip is available
+  apt: name=unzip
+
+- name: Check if the stream enrich is already available
+  stat: path="{{snowplow_stream_enrich_file}}"
+  register: snowplow_stream_enrich
+
+- name: Create Snowplow stream enrich folder if it doesn't exist
+  file:
+    path: "{{snowplow_stream_enrich_installation_folder}}"
+    state: directory
+    mode: 0755
+  when: not snowplow_stream_enrich.stat.exists
+
+- name: "Download Snowplow stream enrich from  {{snowplow_stream_enrich_download_url}}"
+  get_url:
+    url: "{{snowplow_stream_enrich_download_url}}"
+    dest: "{{snowplow_stream_enrich_installation_folder}}/enrich.zip"
+    mode: 0644
+  when: not snowplow_stream_enrich.stat.exists
+
+- name: "Unarchive Snowplow stream enrich"
+  unarchive:
+    src: "{{snowplow_stream_enrich_installation_folder}}/enrich.zip"
+    dest: "{{snowplow_stream_enrich_installation_folder}}"
+    mode: 0744
+    copy: no
+  when: not snowplow_stream_enrich.stat.exists
+
+- name: Setup Snowplow stream enrich configuration
+  template:
+    src: enrich.cfg
+    dest: "{{snowplow_stream_enrich_installation_folder}}/enrich.cfg"
+    mode: 0644
+
+- name: Setup Snowplow stream enrich resolver configuration
+  template:
+    src: resolver.json
+    dest: "{{snowplow_stream_enrich_installation_folder}}/resolver.json"
+    mode: 0644
+
+- name: Create Snowplow stream enrich enrichments folder if it doesn't exist
+  file:
+    path: "{{snowplow_stream_enrich_installation_folder}}/enrichments"
+    state: directory
+    mode: 0755
+
+- name: Setup Snowplow enrichments
+  template:
+    src: "{{item}}"
+    dest: "{{snowplow_stream_enrich_installation_folder}}/enrichments/{{item|basename}}"
+    mode: 0644
+  with_fileglob:
+    - templates/enrichments/*.json
+
+- name: Create Snowplow stream enrich json schema folder if it doesn't exist
+  file:
+    path: "{{snowplow_stream_enrich_installation_folder}}/iglu/schemas/{{analytics_vendor}}/{{(item|basename|splitext)[0]}}/jsonschema"
+    state: directory
+    mode: 0755
+  with_fileglob:
+    - templates/schemas/*.json
+
+- name: Setup Snowplow json schemas
+  template:
+    src: "{{item}}"
+    dest: "{{snowplow_stream_enrich_installation_folder}}/iglu/schemas/{{analytics_vendor}}/{{(item|basename|splitext)[0]}}/jsonschema/1-0-0"
+    mode: 0644
+  with_fileglob:
+    - templates/schemas/*.json
+
+- name: Remove archive
+  file:
+    path: "{{snowplow_stream_enrich_installation_folder}}/enrich.zip"
+    state: absent

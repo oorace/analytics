@@ -1,0 +1,116 @@
+- hosts: all
+  become: true
+
+  pre_tasks:
+    - apt: name=libcurl4-openssl-dev
+    - apt: name=libssl-dev
+    - pip: name=pycurl
+    - file:
+        dest: "{{events_folder}}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+
+  post_tasks:
+    - service: name=logstash state=restarted enabled=yes
+      tags:
+        - analytics
+        - logstash
+
+  roles:
+
+    - role: williamyeh.oracle-java
+      tags:
+        - java
+
+    - role: thefinn93.letsencrypt
+      letsencrypt_webroot_path: "{{nginx_root_folder}}"
+      letsencrypt_email: "{{analytics_admin_email}}"
+      letsencrypt_rsa_key_size: 4096
+      letsencrypt_cert_domains:
+        - "{{analytics_domain_name}}"
+      letsencrypt_renewal_command_args: '--renew-hook "systemctl restart nginx"'
+      tags:
+        - certs
+
+    - role: jdauphant.nginx
+      nginx_sites:
+        iglu: "{{analytics_nginx_iglu}}"
+        analytics_http: "{{analytics_nginx_http}}"
+        analytics_https: "{{analytics_nginx_https_common + (analytics_nginx_https_dev_mode if nginx_mode == 'dev' else analytics_nginx_https_standard_mode)}}"
+      nginx_configs: "{{analytics_nginx_configs}}"
+
+      tags:
+        - nginx
+        - analytics
+
+    - role: analytics
+      tags:
+        - analytics
+
+    - role: snowplow/collector
+      tags:
+        - snowplow
+        - analytics
+
+    - role: snowplow/enrich
+      tags:
+        - snowplow
+        - analytics
+
+    - role: snowplow/pipeline
+      tags:
+        - snowplow
+        - analytics
+
+    - role: vjestin.logstash
+      logstash_startup_options_user: root
+
+      logstash_defaults: |
+        LS_HEAP_SIZE="512m"
+        LS_OPTS="--path.settings ${LS_SETTINGS_DIR} -r --config.reload.interval 2"
+
+      logstash_patterns: |
+        DATEFORMAT %{YEAR}-%{MONTHNUM}-%{MONTHDAY} %{HOUR}:%{MINUTE}:%{SECOND}.[0-9]{3}
+
+      logstash_inputs: |
+        pipe {
+          command => "{{snowplow_pipeline_file}}"
+        }
+
+      logstash_filters: |
+        grok {
+          patterns_dir => ["/etc/logstash/patterns"]
+          match => { "message" => "{{logstash_snowplow_pipeline_filter}}" }
+        }
+        json {
+          source => "contexts"
+          target => "contexts"
+        }
+        json {
+          source => "derived_contexts"
+          target => "derived_contexts"
+        }
+        ruby {
+          code => "
+            contexts = Hash.new;
+            data = event.get('[contexts][data]');
+            unless data.nil?
+              data.each { |context|
+                contexts[context['schema'].scan(/^iglu:.*?\/(.*?)\/jsonschema\/.*?$/).last.first] = context['data']
+              };
+            end
+            event.set('contexts', contexts)            
+            event.set('derived_contexts', event.get('[derived_contexts][data]'))
+          "
+        }
+
+      logstash_outputs: |
+        file {
+          path => "{{events_folder}}/%{app_id}-%{+YYYY-MM-dd_HH}.json.gz"
+          gzip => true
+        }
+      tags:
+        - logstash
+        - analytics

@@ -1,0 +1,3 @@
+- name: Build JavaScript artifact
+  local_action: shell gulp dist --domain "{{analytics_domain_name}}" chdir=".." warn=no
+  become: no

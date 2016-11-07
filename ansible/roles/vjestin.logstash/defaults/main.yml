@@ -1,0 +1,36 @@
+---
+# defaults file for logstash-role
+
+logstash_python_utils:
+ - { package: "python-pycurl" }
+ - { package: "python-apt" }
+
+logstash_version: "5.0"
+
+logstash_apt_repo: "deb http://packages.elasticsearch.org/logstash/{{ logstash_version }}/debian stable main"
+logstash_repo_key: "http://packages.elasticsearch.org/GPG-KEY-elasticsearch"
+logstash_yum_repo_dest: "/etc/yum.repos.d/logstash.repo"
+
+logstash_home: "/usr/share/logstash"
+logstash_settings: "/etc/logstash"
+
+logstash_conf_dir: "/etc/logstash/conf.d/"
+logstash_patterns_file: "/etc/logstash/patterns/extra"
+
+defaults_RedHat: "/etc/sysconfig/logstash"
+defaults_Debian: "/etc/default/logstash"
+
+# following options are required so logstash can be setup correctly as a 'service'
+logstash_startup_options_service_name: "logstash"
+logstash_startup_options_service_description: "logstash"
+logstash_startup_options_user: "logstash"
+logstash_startup_options_group: "logstash"
+logstash_startup_options_home: "{{ logstash_home }}"
+logstash_startup_options_settings_dir: "{{ logstash_settings }}"
+logstash_startup_options_opts: ""
+logstash_startup_options_nice: 19
+logstash_startup_options_open_files: 16384
+logstash_startup_options_prestart: ""
+
+logstash_plugins:
+  - { plugin_name: "logstash-output-null" }

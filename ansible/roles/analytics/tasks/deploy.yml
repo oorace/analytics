@@ -1,0 +1,14 @@
+- name: Read JSON configuration for analytics JavaScript
+  local_action: shell gulp config --silent chdir=".." warn=no
+  register: gulp_config_output
+  become: no
+
+- set_fact:
+    analytics_js_config: "{{ gulp_config_output.stdout|from_json }}"
+
+- name: Setup analytics remote JavaScript
+  copy:
+    src: "../dist/{{analytics_js_config.paths.bundleName}}"
+    dest: "{{analytics_js_installation_folder}}/{{analytics_js_config.paths.bundleName}}"
+    owner: www-data
+    mode: 0644

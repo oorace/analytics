@@ -1,0 +1,15 @@
+snowplow_stream_collector_version: 0.8.0
+snowplow_stream_collector_download_url: http://dl.bintray.com/snowplow/snowplow-generic/snowplow_scala_stream_collector_{{snowplow_stream_collector_version}}.zip
+snowplow_stream_collector_production: false
+snowplow_stream_collector_p3p_policy_ref: /w3c/p3p.xml
+snowplow_stream_collector_p3p_policy: NOI DSP COR NID PSA OUR IND COM NAV STA
+snowplow_stream_collector_cookie: true
+snowplow_stream_collector_cookie_expiration: 365
+snowplow_stream_collector_cookie_name: sp_
+snowplow_stream_collector_cookie_domain: oorace.com
+snowplow_stream_collector_loglevel: "OFF"
+snowplow_stream_collector_loggers: []
+snowplow_stream_collector_remote_address_header: on
+snowplow_stream_collector_uri_parsing_mode: relaxed
+snowplow_stream_collector_raw_request_uri_header: on
+snowplow_stream_collector_max_uri_length: 32768

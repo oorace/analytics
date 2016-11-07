@@ -1,0 +1,12 @@
+- hosts: development
+
+- hosts: development
+  become: true
+  environment:
+    GOPATH: "{{go_path}}"
+
+  roles:
+
+    - role: angstwad.docker_ubuntu
+
+    - role: boulder

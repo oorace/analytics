@@ -1,0 +1,14 @@
+.classpath
+.project
+.settings/
+.idea/
+target/
+.DS_Store
+*.iml
+.vagrant/
+*.swp
+*.retry
+*.log
+yarn.lock
+dist/
+node_modules/

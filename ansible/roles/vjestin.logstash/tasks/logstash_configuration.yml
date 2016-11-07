@@ -1,0 +1,38 @@
+---
+- name: Ensure Logstash Patterns Directory Exists
+  file: path={{ logstash_patterns_file|dirname }}
+        state=directory
+        owner=root
+        group=root
+        mode=0755
+
+- name: Copy Logstash Patterns Configuration
+  template: src=patterns.j2
+            dest={{ logstash_patterns_file }}
+            owner=root
+            group=root
+            mode=0644
+
+- name: Validate and copy Logstash Input Configuration
+  template: src=input.conf.j2
+            dest={{ logstash_conf_dir }}input.conf
+            owner=root
+            group=root
+            mode=0644
+            validate='{{ logstash_home }}/bin/logstash --path.settings {{ logstash_settings }} -tf %s'
+
+- name: Validate and copy Logstash Filter Configuration
+  template: src=filters.conf.j2
+            dest={{ logstash_conf_dir }}filters.conf
+            owner=root
+            group=root
+            mode=0644
+            validate='{{ logstash_home }}/bin/logstash --path.settings {{ logstash_settings }} -tf %s'
+
+- name: Validate and copy Logstash Output Configuration
+  template: src=output.conf.j2
+            dest={{ logstash_conf_dir }}output.conf
+            owner=root
+            group=root
+            mode=0644
+            validate='{{ logstash_home }}/bin/logstash --path.settings {{ logstash_settings }} -tf %s'

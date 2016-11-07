@@ -1,0 +1,49 @@
+- name: Install docker python client
+  pip: name=docker-py version=1.9.0
+
+- name: "Checkout boulder repository"
+  git:
+    repo: https://github.com/letsencrypt/boulder
+    dest: "{{go_path}}/src/github.com/letsencrypt/boulder"
+    version: release-2016-07-14
+    force: yes
+
+- name: "Get docker host ip"
+  shell: "ifconfig docker0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'"
+  register: docker_host_ip
+
+- name: "Set DNS for Boulder"
+  lineinfile:
+    dest: "{{go_path}}/src/github.com/letsencrypt/boulder/docker-compose.yml"
+    regexp: '(\s+)FAKE_DNS:(\s+.*)?$'
+    line: '\1FAKE_DNS: {{docker_host_ip.stdout}}'
+    backrefs: yes
+
+- name: "Set HTTP Port for Boulder"
+  lineinfile:
+    dest: "{{go_path}}/src/github.com/letsencrypt/boulder/test/config/va.json"
+    regexp: '(\s+)"httpPort": 5002,(\s+)?$'
+    line: '\1"httpPort": 80,'
+    backrefs: yes
+
+- name: "Set HTTPS Port for Boulder"
+  lineinfile:
+    dest: "{{go_path}}/src/github.com/letsencrypt/boulder/test/config/va.json"
+    regexp: '(\s+)"httpsPort": 5001,(\s+)?$'
+    line: '\1"httpPort": 443,'
+    backrefs: yes
+
+- name: "Set TLS Port for Boulder"
+  lineinfile:
+    dest: "{{go_path}}/src/github.com/letsencrypt/boulder/test/config/va.json"
+    regexp: '(\s+)"tlsPort": 5001(\s+)?$'
+    line: '\1"tlsPort": 443'
+    backrefs: yes
+
+- name: "Start boulder CA"
+  docker_service:
+    project_src: "{{go_path}}/src/github.com/letsencrypt/boulder"
+    state: present
+
+- name: Wait for boulder to start
+  wait_for: host="localhost" port=4000 delay=5 state=started timeout=120

@@ -1,0 +1,4 @@
+snowplow_stream_enrich_version: 0.9.0
+snowplow_stream_enrich_download_url: http://dl.bintray.com/snowplow/snowplow-generic/snowplow_stream_enrich_{{snowplow_stream_enrich_version}}.zip
+snowplow_stream_enrich_loglevel: "OFF"
+snowplow_stream_enrich_loggers: []

@@ -1,0 +1,37 @@
+---
+- name: Check whether an update for Logstash is available (RH)
+  shell: 'yum makecache && yum check-update || test $? -eq 100'
+  when: ansible_pkg_mgr == "yum"
+  register: update_result
+  changed_when: "'logstash' in update_result.stdout"
+
+- name: Stop Logstash before upgrading
+  service: name=logstash
+           state=stopped
+           enabled=yes
+  when: update_result.changed
+
+- name: Enable Logstash repository
+  template: src=logstash_repo.j2
+            dest={{ logstash_yum_repo_dest }}
+
+- name: Add Logstash Repo Key
+  rpm_key: key="{{ logstash_repo_key }}"
+           state=present
+
+- name: Install Logstash
+  yum: name=logstash
+       state=latest
+       update_cache=yes
+  notify:
+   - start logstash
+
+- name: Configure default settings for Logstash
+  template: src=defaults.conf.j2
+            dest={{ defaults_RedHat }}
+            owner=root
+            group=root
+            mode=0644
+            backup=yes
+  notify:
+   - restart logstash

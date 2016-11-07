@@ -1,0 +1,12 @@
+---
+# handlers file for logstash-role
+
+- name: start logstash
+  service: name=logstash
+           state=started
+           enabled=yes
+
+- name: restart logstash
+  service: name=logstash
+           state=restarted
+           enabled=yes

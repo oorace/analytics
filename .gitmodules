@@ -1,0 +1,15 @@
+[submodule "ansible/roles/angstwad.docker_ubuntu"]
+	path = ansible/roles/angstwad.docker_ubuntu
+	url = https://github.com/angstwad/docker.ubuntu
+[submodule "ansible/roles/jdauphant.nginx"]
+	path = ansible/roles/jdauphant.nginx
+	url = https://github.com/jdauphant/ansible-role-nginx
+[submodule "ansible/roles/williamyeh.oracle-java"]
+	path = ansible/roles/williamyeh.oracle-java
+	url = https://github.com/William-Yeh/ansible-oracle-java
+[submodule "ansible/roles/thefinn93.letsencrypt"]
+	path = ansible/roles/thefinn93.letsencrypt
+	url = https://github.com/thefinn93/ansible-letsencrypt
+[submodule "ansible/roles/vjestin.logstash"]
+	path = ansible/roles/vjestin.logstash
+	url = https://github.com/vjestin/logstash-role.git

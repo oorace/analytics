@@ -1,0 +1,27 @@
+
+
+- name: Update startup.options file
+  # because backup option on lineinfile below would create a new backup file each time
+  copy: src="{{ logstash_settings }}/startup.options" dest="{{ logstash_settings }}/startup.options.{{ansible_date_time.iso8601}}" remote_src=yes
+- lineinfile: dest="{{ logstash_settings }}/startup.options" regexp="^({{ item.key }}).*$" line="\1={{ item.value }}" backrefs=yes backup=no
+  with_items:
+    - { key: "SERVICE_NAME", value: "{{logstash_startup_options_service_name}}" }
+    - { key: "SERVICE_DESCRIPTION", value: "{{logstash_startup_options_service_description}}" }
+    - { key: "LS_USER", value: "{{logstash_startup_options_user}}" }
+    - { key: "LS_GROUP", value: "{{logstash_startup_options_group}}" }
+    - { key: "LS_HOME", value: "{{logstash_startup_options_home}}" }
+    - { key: "LS_SETTINGS_DIR", value: "{{logstash_startup_options_settings_dir}}" }
+    - { key: "LS_OPTS", value: "{{logstash_startup_options_opts}}" }
+    - { key: "LS_NICE", value: "{{logstash_startup_options_nice}}" }
+    - { key: "LS_OPEN_FILES", value: "{{logstash_startup_options_open_files}}" }
+
+- blockinfile: dest="{{ logstash_settings }}/startup.options" content="{{ logstash_startup_options_prestart }}" insertbefore="^## EOM" backup=no
+  when: "logstash_startup_options_prestart != ''"
+
+- replace: dest="{{ logstash_settings }}/startup.options" regexp="^## (.*)$" replace="\1" backup=no
+  when: "logstash_startup_options_prestart != ''"
+
+- name: Setup logstash service
+  shell: '{{ logstash_home }}/bin/system-install {{ logstash_settings }}/startup.options'
+  notify:
+   - restart logstash

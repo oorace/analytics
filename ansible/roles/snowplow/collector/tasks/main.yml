@@ -1,0 +1,42 @@
+- fail: msg="'snowplow_stream_collector_installation_folder' variable must be defined"
+  when: snowplow_stream_collector_installation_folder is not defined
+
+- name: Make sure unzip is available
+  apt: name=unzip
+
+- name: Check if the collector is already available
+  stat: path="{{snowplow_stream_collector_file}}"
+  register: snowplow_stream_collector
+
+- name: Create Snowplow stream collector folder if it doesn't exist
+  file:
+    path: "{{snowplow_stream_collector_installation_folder}}"
+    state: directory
+    mode: 0755
+  when: not snowplow_stream_collector.stat.exists
+
+- name: "Download Snowplow stream collector from  {{snowplow_stream_collector_download_url}}"
+  get_url:
+    url: "{{snowplow_stream_collector_download_url}}"
+    dest: "{{snowplow_stream_collector_installation_folder}}/collector.zip"
+    mode: 0644
+  when: not snowplow_stream_collector.stat.exists
+
+- name: "Unarchive Snowplow stream collector"
+  unarchive:
+    src: "{{snowplow_stream_collector_installation_folder}}/collector.zip"
+    dest: "{{snowplow_stream_collector_installation_folder}}"
+    mode: 0744
+    copy: no
+  when: not snowplow_stream_collector.stat.exists
+
+- name: Setup Snowplow stream collector configuration
+  template:
+    src: collector.cfg
+    dest: "{{snowplow_stream_collector_installation_folder}}/collector.cfg"
+    mode: 0644
+
+- name: Remove archive
+  file:
+    path: "{{snowplow_stream_collector_installation_folder}}/collector.zip"
+    state: absent

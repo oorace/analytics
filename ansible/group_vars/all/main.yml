@@ -1,0 +1,22 @@
+analytics_admin_email: admin@localhost
+analytics_domain_name: analytics.dev
+analytics_path: /analytics
+analytics_vendor: dev.analytics
+analytics_not_found_redirect: http://google.com
+analytics_js_installation_folder: "{{nginx_root_folder}}/analytics"
+
+nginx_mode: standard
+nginx_root_folder: /var/www
+
+snowplow_iglu_bind_port: 6666
+snowplow_stream_collector_bind_host: 127.0.0.1
+snowplow_stream_collector_bind_port: 8080
+snowplow_stream_collector_installation_folder: "/opt/snowplow/collector"
+snowplow_stream_enrich_installation_folder: "/opt/snowplow/enrich"
+snowplow_pipeline_installation_folder: "/opt/snowplow"
+snowplow_pipeline_file: "{{snowplow_pipeline_installation_folder}}/pipeline.sh"
+snowplow_stream_collector_file: "{{snowplow_stream_collector_installation_folder}}/snowplow-stream-collector-{{snowplow_stream_collector_version}}"
+snowplow_stream_enrich_file: "{{snowplow_stream_enrich_installation_folder}}/snowplow-stream-enrich-{{snowplow_stream_enrich_version}}"
+events_folder: /data/events
+
+logstash_snowplow_pipeline_filter: "(%{DATA:app_id})?\t(%{DATA:platform})?\t(%{DATEFORMAT:etl_tstamp})?\t(%{DATEFORMAT:collector_tstamp})?\t(%{DATEFORMAT:dvce_created_tstamp})?\t(%{DATA:event})?\t(%{UUID:event_id})?\t(%{INT:txn_id})?\t(%{DATA:name_tracker})?\t(%{DATA:v_tracker})?\t(%{DATA:v_collector})?\t(%{DATA:v_etl})?\t(%{DATA:user_id})?\t(%{IP:user_ipaddress})?\t(%{INT:user_fingerprint})?\t(%{DATA:domain_userid})?\t(%{DATA:domain_sessionidx})?\t(%{DATA:network_userid})?\t(%{DATA:geo_country})?\t(%{DATA:geo_region})?\t(%{DATA:geo_city})?\t(%{DATA:geo_zipcode})?\t(%{DATA:geo_latitude})?\t(%{DATA:geo_longitude})?\t(%{DATA:geo_region_name})?\t(%{DATA:ip_isp})?\t(%{DATA:ip_organization})?\t(%{DATA:ip_domain})?\t(%{DATA:ip_netspeed})?\t(%{URI:page_url})?\t(%{DATA:page_title})?\t(%{URI:page_referrer})?\t(%{URIPROTO:page_urlscheme})?\t(%{IPORHOST:page_urlhost})?\t(%{POSINT:page_urlport})?\t(%{URIPATH:page_urlpath})?\t(%{URIPARAM:page_urlquery})?\t(%{DATA:page_urlfragment})?\t(%{URIPROTO:refr_urlscheme})?\t(%{IPORHOST:refr_urlhost})?\t(%{POSINT:refr_urlport})?\t(%{URIPATH:refr_urlpath})?\t(%{URIPARAM:refr_urlquery})?\t(%{DATA:refr_urlfragment})?\t(%{DATA:refr_medium})?\t(%{DATA:refr_source})?\t(%{DATA:refr_term})?\t(%{DATA:mkt_medium})?\t(%{DATA:mkt_source})?\t(%{DATA:mkt_term})?\t(%{DATA:mkt_content})?\t(%{DATA:mkt_campaign})?\t(%{DATA:contexts})?\t(%{DATA:se_category})?\t(%{DATA:se_action})?\t(%{DATA:se_label})?\t(%{DATA:se_property})?\t(%{NUMBER:se_value})?\t(%{DATA:unstruct_event})?\t(%{DATA:tr_orderid})?\t(%{DATA:tr_affiliation})?\t(%{NUMBER:tr_total})?\t(%{NUMBER:tr_tax})?\t(%{NUMBER:tr_shipping})?\t(%{DATA:tr_city})?\t(%{DATA:tr_state})?\t(%{DATA:tr_country})?\t(%{DATA:ti_orderid})?\t(%{DATA:ti_sku})?\t(%{DATA:ti_name})?\t(%{DATA:ti_category})?\t(%{NUMBER:ti_price})?\t(%{INT:ti_quantity})?\t(%{INT:pp_xoffset_min})?\t(%{INT:pp_xoffset_max})?\t(%{INT:pp_yoffset_min})?\t(%{INT:pp_yoffset_max})?\t(%{DATA:useragent})?\t(%{DATA:br_name})?\t(%{DATA:br_family})?\t(%{DATA:br_version})?\t(%{DATA:br_type})?\t(%{DATA:br_renderengine})?\t(%{DATA:br_lang})?\t(%{DATA:br_features_pdf})?\t(%{DATA:br_features_flash})?\t(%{DATA:br_features_java})?\t(%{DATA:br_features_director})?\t(%{DATA:br_features_quicktime})?\t(%{DATA:br_features_realplayer})?\t(%{DATA:br_features_windowsmedia})?\t(%{DATA:br_features_gears})?\t(%{DATA:br_features_silverlight})?\t(%{DATA:br_cookies})?\t(%{INT:br_colordepth})?\t(%{INT:br_viewwidth})?\t(%{INT:br_viewheight})?\t(%{DATA:os_name})?\t(%{DATA:os_family})?\t(%{DATA:os_manufacturer})?\t(%{DATA:os_timezone})?\t(%{DATA:dvce_type})?\t(%{DATA:dvce_ismobile})?\t(%{INT:dvce_screenwidth})?\t(%{INT:dvce_screenheight})?\t(%{DATA:doc_charset})?\t(%{INT:doc_width})?\t(%{INT:doc_height})?\t(%{DATA:tr_currency})?\t(%{NUMBER:tr_total_base})?\t(%{NUMBER:tr_tax_base})?\t(%{NUMBER:tr_shipping_base})?\t(%{DATA:ti_currency})?\t(%{NUMBER:ti_price_base})?\t(%{DATA:base_currency})?\t(%{DATA:geo_timezone})?\t(%{DATA:mkt_clickid})?\t(%{DATA:mkt_network})?\t(%{DATA:etl_tags})?\t(%{DATEFORMAT:dvce_sent_tstamp})?\t(%{DATA:refr_domain_userid})?\t(%{DATEFORMAT:refr_dvce_tstamp})?\t(%{DATA:derived_contexts})?\t(%{DATA:domain_sessionid})?\t(%{DATEFORMAT:derived_tstamp})?\t(%{DATA:event_vendor})?\t(%{DATA:event_name})?\t(%{DATA:event_format})?\t(%{DATA:event_version})?\t(%{DATA:event_fingerprint})?\t(%{DATEFORMAT:true_tstamp})?"

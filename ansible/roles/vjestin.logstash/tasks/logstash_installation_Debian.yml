@@ -1,0 +1,37 @@
+---
+- name: Check whether an update for Logstash is available (Deb)
+  shell: 'apt-get update && apt-get upgrade --dry-run'
+  register: update_result
+  changed_when: "'logstash ' in update_result.stdout" # space character after logstash is important to distinguish available update line from another message.
+
+- name: Stop Logstash before upgrading
+  service: name=logstash
+           state=stopped
+           enabled=yes
+  when: update_result.changed
+
+- name: Enable Logstash Repository
+  apt_repository: repo="{{ logstash_apt_repo }}"
+                  state=present
+
+- name: Add Logstash Repo Key
+  apt_key: url="{{ logstash_repo_key }}"
+           state=present
+
+- name: Install Logstash
+  apt: pkg=logstash
+       update_cache=yes
+       allow_unauthenticated=yes
+       state=latest
+  notify:
+   - start logstash
+
+- name: Configure default settings for Logstash
+  template: src=defaults.conf.j2
+            dest={{ defaults_Debian }}
+            owner=root
+            group=root
+            mode=0644
+            backup=yes
+  notify:
+   - restart logstash

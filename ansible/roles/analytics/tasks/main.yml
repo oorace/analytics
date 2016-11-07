@@ -1,0 +1,18 @@
+- fail: msg="'analytics_js_installation_folder' variable must be defined"
+  when: analytics_js_installation_folder is not defined
+
+- name: Make sure zip is available
+  apt: name=zip
+
+- name: Create analytics folder if it doesn't exist
+  file:
+    path: "{{analytics_js_installation_folder}}"
+    state: directory
+    owner: www-data
+    mode: 0755
+
+- include: build.yml
+  tags:
+    - build
+
+- include: deploy.yml

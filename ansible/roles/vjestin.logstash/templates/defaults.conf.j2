@@ -1,0 +1,5 @@
+LS_HOME="{{ logstash_home }}"
+LS_SETTINGS_DIR="{{ logstash_settings }}"
+{% if logstash_defaults is defined %}
+{{ logstash_defaults }}
+{% endif %}

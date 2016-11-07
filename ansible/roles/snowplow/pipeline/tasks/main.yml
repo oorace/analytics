@@ -1,0 +1,14 @@
+- fail: msg="'snowplow_pipeline_installation_folder' variable must be defined"
+  when: snowplow_pipeline_installation_folder is not defined
+
+- name: Create Snowplow stream enrich folder if it doesn't exist
+  file:
+    path: "{{snowplow_pipeline_installation_folder}}"
+    state: directory
+    mode: 0755
+
+- name: Create Snowplow pipeline script
+  template:
+    src: pipeline.sh
+    dest: "{{snowplow_pipeline_file}}"
+    mode: 0744
